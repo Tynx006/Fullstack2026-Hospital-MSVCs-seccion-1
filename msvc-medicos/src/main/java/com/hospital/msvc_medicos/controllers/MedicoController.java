@@ -29,4 +29,7 @@ public class MedicoController {
     public ResponseEntity<Medico> findById(@PathVariable Long id) {
         return ResponseEntity.ok(this.medicoService.findById(id));
     }
+
+
+    //testing
 }
