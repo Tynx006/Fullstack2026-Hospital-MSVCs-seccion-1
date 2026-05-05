@@ -1,0 +1,86 @@
+PROPUESTA DE INTEGRACION DE SPRING SECURITY
+
+Objetivo
+Integrar Spring Security en el proyecto de microservicios del hospital para controlar autenticacion y autorizacion de forma centralizada, segura y escalable.
+
+Contexto actual
+El proyecto esta compuesto por tres microservicios:
+- msvc-pacientes
+- msvc-medicos
+- msvc-atenciones
+
+Actualmente los servicios exponen endpoints sin una capa de seguridad comun. La propuesta es incorporar autenticacion basada en JWT para que cada microservicio pueda validar el token recibido y aplicar reglas de acceso segun roles.
+
+Enfoque propuesto
+Se recomienda implementar seguridad con el siguiente esquema:
+
+1. Crear un servicio de autenticacion independiente o integrar un proveedor como Keycloak.
+2. El usuario inicia sesion y recibe un token JWT.
+3. Cada microservicio valida el token JWT en cada solicitud protegida.
+4. Los endpoints se restringen por rol, por ejemplo ADMIN, MEDICO o RECEPCION.
+5. Las llamadas entre microservicios deben propagar el token para mantener el contexto de seguridad.
+
+Dependencias sugeridas
+En cada microservicio se deberia agregar:
+- spring-boot-starter-security
+- spring-boot-starter-oauth2-resource-server
+
+Con esto cada servicio actuaria como Resource Server y podria validar JWT sin depender directamente de la logica de login.
+
+Configuracion propuesta
+En cada microservicio se deberia crear una clase SecurityConfig con una configuracion similar a esta:
+
+- deshabilitar o ajustar CSRF si la API sera stateless
+- permitir acceso a rutas publicas necesarias, por ejemplo /h2-console en desarrollo
+- exigir autenticacion para /api/**
+- habilitar validacion JWT
+- activar autorizacion por metodos con @PreAuthorize
+
+Ejemplo de reglas
+- GET de consulta general: roles ADMIN o MEDICO
+- POST, PUT, DELETE: solo ADMIN
+- Endpoints internos o tecnicos: segun necesidad del flujo entre microservicios
+
+Aplicacion por microservicio
+
+msvc-medicos
+- Proteger endpoints de consulta y administracion de medicos
+- Restringir operaciones sensibles por rol
+
+msvc-pacientes
+- Proteger acceso a datos de pacientes
+- Permitir solo roles autorizados para consultar o modificar informacion clinica
+
+msvc-atenciones
+- Proteger la creacion y consulta de atenciones
+- Propagar el header Authorization cuando invoque a otros microservicios por Feign
+
+Manejo de roles
+Los roles pueden ir dentro del token JWT. Spring Security puede leerlos y convertirlos en authorities para aplicar reglas como:
+- hasRole('ADMIN')
+- hasAnyRole('ADMIN','MEDICO')
+
+Ventajas de este enfoque
+- Seguridad centralizada
+- Menor acoplamiento entre autenticacion y negocio
+- Escalabilidad para agregar nuevos microservicios
+- Facil integracion con API Gateway o proveedor externo de identidad
+
+Recomendaciones tecnicas
+- Evitar mezclar WebMVC y WebFlux si no es necesario, porque complica la configuracion
+- Mantener el proyecto como API stateless
+- Separar claramente endpoints publicos y privados
+- Agregar manejo de errores de autenticacion y autorizacion
+- Considerar un API Gateway mas adelante para centralizar filtros y politicas
+
+Pasos sugeridos de implementacion
+1. Agregar dependencias de Spring Security en los tres microservicios.
+2. Definir proveedor de autenticacion JWT.
+3. Crear SecurityConfig en cada servicio.
+4. Configurar rutas publicas y protegidas.
+5. Incorporar autorizacion por roles con anotaciones.
+6. Propagar tokens en llamadas Feign.
+7. Probar acceso con distintos perfiles de usuario.
+
+Conclusion
+La mejor forma de integrar Spring Security en este proyecto es mediante JWT y validacion distribuida en cada microservicio. Esto permite asegurar los endpoints sin mezclar la logica de autenticacion con la logica de negocio, y deja una base preparada para crecer a futuro con mas servicios o un gateway.
