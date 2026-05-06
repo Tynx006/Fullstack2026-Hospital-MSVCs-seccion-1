@@ -22,7 +22,7 @@
     </properties>
     <packaging>pom</packaging>
     <modules>
-        <module>msvc-pacientes</module>
+        <module>msvc-paciente</module>
         <module>msvc-medicos</module>
         <module>msvc-atenciones</module>
     </modules>

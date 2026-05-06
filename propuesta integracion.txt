@@ -5,7 +5,7 @@ Integrar Spring Security en el proyecto de microservicios del hospital para cont
 
 Contexto actual
 El proyecto esta compuesto por tres microservicios:
-- msvc-pacientes
+- msvc-paciente
 - msvc-medicos
 - msvc-atenciones
 
@@ -47,8 +47,8 @@ msvc-medicos
 - Proteger endpoints de consulta y administracion de medicos
 - Restringir operaciones sensibles por rol
 
-msvc-pacientes
-- Proteger acceso a datos de pacientes
+msvc-paciente
+- Proteger acceso a datos de paciente
 - Permitir solo roles autorizados para consultar o modificar informacion clinica
 
 msvc-atenciones

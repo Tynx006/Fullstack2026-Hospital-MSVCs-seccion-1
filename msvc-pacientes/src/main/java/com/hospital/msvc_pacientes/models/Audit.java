@@ -11,8 +11,6 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-
-
 /**
  * @Embeddable -> Esto es una clase que vive dentro de otra para poder registrar
  * valores antes de crear y despúes de modificar.
@@ -27,13 +25,18 @@ public class Audit {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-// lolw
+    /**
+     * Este método se ejecuta automaticamente una vez que el objeto es creado
+     */
     @PrePersist
     public void prePersist(){
         this.createdAt = LocalDateTime.now();
     }
 
-
+    /**
+     * Este método se ejecuta automaticamente cuando se realiza cualquier actu
+     * lización del objeto que se encuentra asociado.
+     */
     @PreUpdate
     public void preUpdate(){
         this.updatedAt = LocalDateTime.now();
